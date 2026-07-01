@@ -52,32 +52,48 @@ leafMask = im2bw(grayLeaf, level);  % For MATLAB 2014
 leafMask = imopen(leafMask, strel('disk', 10));
 
 % Step 6: Healthy (white) and diseased (black) output
+
 healthyLeafMask = leafMask & ~cleanMask;
 
 % Step 7: Side-by-side display
+
 figure;
+
 %subplot(1,2,1);
+
 imshow(img);
+
 title('Original Leaf Image');
 
+
 %subplot(1,2,2);
+
 imshow(healthyLeafMask);
+
 title('Diseased (in Black) Detect Mask');
 
 % Step 8: Save output
+
 imwrite(healthyLeafMask, 'Healthy_vs_Diseased_BW.png');
 
 % Step 9: Area Calculation
+
 diseaseArea = sum(cleanMask(:));
+
 leafArea = sum(leafMask(:));
 
 fprintf('Disease Area (pixels): %d\n', diseaseArea);
+
 fprintf('Leaf Area (pixels): %d\n', leafArea);
 
 if leafArea > 0
+
     diseasePercent = (diseaseArea / leafArea) * 100;
+    
 else
+
     diseasePercent = 0;
+    
 end
 
 fprintf('Percentage of Diseased Area: %.2f%%\n', diseasePercent);
