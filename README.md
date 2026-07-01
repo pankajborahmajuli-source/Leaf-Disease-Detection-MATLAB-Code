@@ -1,99 +1,79 @@
-# Leaf-Disease-Detection-MATLAB-Code
-clc; 
-clear;
+# MATLAB-Based Image Processing Protocol for Plant Disease Detection
 
-% Step 1: Load the image
+## Overview
 
-[filename, pathname] = uigetfile({'*.jpg;*.png;*.jpeg'}, 'Select an Image');
+The workflow identifies diseased regions using HSV colour thresholding and calculates disease severity based on pixel counting.
 
-img = imread(fullfile(pathname, filename));
+----------------------------------------
 
-figure, imshow(img), title('Original Image')
+## Requirements
 
+MATLAB R2014 or later
 
-% Step 2: Convert to HSV
+Image Processing Toolbox
 
-hsvImg = rgb2hsv(img);
+----------------------------------------
 
-H = hsvImg(:,:,1);
+## Files
 
-S = hsvImg(:,:,2);
+DiseaseDetection.m
+Main MATLAB program
 
-V = hsvImg(:,:,3);
+Sample_Images/
+Example images
 
+Output/
+Example binary masks
 
+----------------------------------------
 
-%Original  Step 3: Create mask for diseased regions
+## Installation
 
-maskH = (H > 0.05) & (H < 0.15);
+1. Download the repository.
 
-maskS = (S > 0.2);
+2. Open MATLAB.
 
-maskV = (V > 0.2) & (V < 0.85);
+3. Open DiseaseDetection.m
 
-diseaseMask = maskH & maskS & maskV;
+4. Run the script.
 
-% Step 4: Clean the mask
+5. Select an image when prompted.
 
-cleanMask = imopen(diseaseMask, strel('disk', 2));
+----------------------------------------
 
-cleanMask = imclose(cleanMask, strel('disk', 4));
+## Input
 
-cleanMask = imfill(cleanMask, 'holes');
+RGB leaf image (.jpg, .png, .jpeg)
 
-% Step 5: Leaf mask (whole leaf)
+----------------------------------------
 
-grayLeaf = rgb2gray(img);
+## Output
 
-level = graythresh(grayLeaf);
+Original image
 
-leafMask = im2bw(grayLeaf, level);  % For MATLAB 2014
+Binary disease mask
 
-leafMask = imopen(leafMask, strel('disk', 10));
+Healthy leaf mask
 
-% Step 6: Healthy (white) and diseased (black) output
+Disease area (pixels)
 
-healthyLeafMask = leafMask & ~cleanMask;
+Leaf area (pixels)
 
-% Step 7: Side-by-side display
+Disease percentage (%)
 
-figure;
+----------------------------------------
 
-%subplot(1,2,1);
+## HSV Thresholds
 
-imshow(img);
+Hue:
+0.05–0.15
 
-title('Original Leaf Image');
+Saturation:
+>0.20
 
+Value:
+0.20–0.85
 
-%subplot(1,2,2);
+These values were empirically selected under controlled illumination and may require adjustment for different plant species or imaging conditions.
 
-imshow(healthyLeafMask);
-
-title('Diseased (in Black) Detect Mask');
-
-% Step 8: Save output
-
-imwrite(healthyLeafMask, 'Healthy_vs_Diseased_BW.png');
-
-% Step 9: Area Calculation
-
-diseaseArea = sum(cleanMask(:));
-
-leafArea = sum(leafMask(:));
-
-fprintf('Disease Area (pixels): %d\n', diseaseArea);
-
-fprintf('Leaf Area (pixels): %d\n', leafArea);
-
-if leafArea > 0
-
-    diseasePercent = (diseaseArea / leafArea) * 100;
-    
-else
-
-    diseasePercent = 0;
-    
-end
-
-fprintf('Percentage of Diseased Area: %.2f%%\n', diseasePercent);
+----------------------------------------
